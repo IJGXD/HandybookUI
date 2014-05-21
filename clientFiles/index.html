@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html ng-app="indexApp">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Cleaning booking</title>
+
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <!-- Bootstrap -->
+    <link href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+    <!--Angular-->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.1/angular.min.js"></script>
+    <!--Custom-->
+    <script src="script.js"></script>
+    <link href="style.css" rel="stylesheet">
+
+</head>
+<body><div class="container" ng-controller="IndexCtrl">
+	<nav class="navbar navbar-default" role="navigation">
+		<div class="container-fluid">
+			<div class="navbar-header">
+		      	<a class="navbar-brand" href="#">Handybook <i>UI</i></a>
+			</div>
+			<ul class="nav navbar-nav navbar-right">
+	        	<li><a href="#" ng-click="toggleCreate()" id="createNewTerminalButton">Book now</a></li>
+	      	</ul>
+		</div>
+	</nav>
+	<div class="alert alert-success hidden" id="successAlert">{{successMessage}}</div>
+	<div class="alert alert-danger hidden" id="errorAlert">{{errorMessage}}</div>
+	<div id="showBookings">
+		<input type="text" placeholder="Search" class="form-control" ng-model="queryBookings">
+		<table class="table">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>Name</th>
+					<th>Address</th>
+					<th>Time</th>
+					<th colspan="2">Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="row in bookings | filter:queryBookings">
+					<td>{{row.id}}</td>
+					<td>{{row.first_name}} {{row.last_name}}</td>
+					<td>{{row.address_line_one}}, {{row.zipcode}}</td>
+					<td>{{row.time}}</td>
+					<td><a ng-click="cancelBooking(row)">Cancel</a></td>
+					<td><a ng-click="addComment(row)">Add comment</a></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<div id="newBooking" ng-model="newBookingForm" class="hidden">
+		<div class="row">
+			<div class="col-md-9">
+				<form ng-model="newBookingForm" name="newBookingForm">
+					<label>First name: </label><input type="text" class="form-control" ng-model="newBookingFirstName" name="newBookingFirstName" required>
+					<p ng-show="newBookingForm.newBookingFirstName.$invalid" class="help=block">First name required</p>
+					<br/>
+
+					<label>Last name: </label><input type="text" class="form-control" ng-model="newBookingLastName" name="newBookingLastName" required>
+					<p ng-show="newBookingForm.newBookingLastName.$invalid" class="help=block">Last name required</p>
+					<br/>
+
+					<label>Email: </label><input type="email" class="form-control" ng-model="newBookingEmail" name="newBookingEmail" required>
+					<p ng-show="newBookingForm.newBookingEmail.$invalid" class="help=block">Email required</p>
+					<br/>
+
+					<label>Phone: </label><input type="phone" class="form-control" ng-model="newBookingPhone" name="newBookingPhone" required>
+					<p ng-show="newBookingForm.newBookingPhone.$invalid" class="help=block">Phone required</p>
+					<br/>
+
+					<label>Zipcode: </label><input type="text" class="form-control" ng-model="newBookingZip" name="newBookingZip" ng-change="updateQuote()" required>
+					<p ng-show="newBookingForm.newBookingZip.$invalid" class="help=block">Zipcode required</p>
+					<br/>
+
+					<label>Address - Line 1: </label><input type="text" class="form-control" ng-model="newBookingAddress1" name="newBookingAddress1" required>
+					<p ng-show="newBookingForm.newBookingAddress1.$invalid" class="help=block">Address required</p>
+					<br/>
+
+					<label>Address - Line 2: </label><input type="text" class="form-control" ng-model="newBookingAddress2" name="newBookingAddress2">
+					<br/>
+
+					<label>Address - City: </label><input type="text" class="form-control" ng-model="newBookingAddressCity" name="newBookingAddressCity" required>
+					<p ng-show="newBookingForm.newBookingAddressCity.$invalid" class="help=block">City required</p>
+					<br/>
+
+					<label>Address - State: </label><input type="text" class="form-control" ng-model="newBookingAddressState" name="newBookingAddressState" required>
+					<p ng-show="newBookingForm.newBookingAddressState.$invalid" class="help=block">State required</p>
+					<br/>
+
+					<label>Bedrooms: </label><input type="text" class="form-control" ng-model="newBookingBedrooms" name="newBookingBedrooms" ng-change="updateQuote()" required>
+					<p ng-show="newBookingForm.newBookingBedrooms.$invalid" class="help=block">Bedrooms number required</p>
+					<br/>
+
+					<label>Bathrooms (one bathrooms is 0.5): </label><input type="text" class="form-control" ng-model="newBookingBathrooms" name="newBookingBathrooms" ng-change="updateQuote()" required>
+					<p ng-show="newBookingForm.newBookingBathrooms.$invalid" class="help=block">Bathrooms number required</p>
+					<br/>
+
+					<label>Time (YYYY-MM-DD HH:MM): </label><input type="text" class="form-control" ng-model="newBookingTime" name="newBookingTime" required>
+					<p ng-show="newBookingForm.newBookingTime.$invalid" class="help=block">Time required</p>
+					<br/>
+
+				</form>
+			</div>
+			<div class="col-md-3 sidebar-outer">
+				<div class="sidebar">
+					<div class="panel panel-default">
+					  	<div class="panel-heading">
+					    	<h3 class="panel-title">Quote</h3>
+					  	</div>
+					  	<div class="panel-body">
+					    	<p>Bedrooms: {{newBookingBedrooms}}</p>
+							<p>Bathrooms: {{newBookingBathrooms}}</p>
+							<p>ZIP: {{newBookingZip}}</p>
+					  	</div>
+					  	<div class="panel-footer">Quote is {{currentQuote}}</div>
+					</div>
+					<button type="button" class="btn btn-success" style="margin-bottom:1em" ng-click="submitBooking()">Book!</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div></body>
+</html>
